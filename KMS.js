@@ -48,7 +48,7 @@ module.exports = function(RED) {
         }
 
 		var awsService = new AWS.KMS( { 'region': node.region } );
-
+		
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
 				if (err) {
@@ -57,7 +57,7 @@ module.exports = function(RED) {
                     node.send([null, { err: err }]);
     				return;
 				} else {
-				msg.payload = data;
+				msg.payload.resp = data;
 				node.status({});
 				}
 				node.send([msg,null]);
@@ -69,7 +69,7 @@ module.exports = function(RED) {
 
 			if (typeof service[node.operation] == "function"){
 				node.status({fill:"blue",shape:"dot",text:node.operation});
-				service[node.operation](awsService,msg,_cb);
+				service[node.operation](awsService,msg.payload,_cb);
 			} else {
 				node.error("failed: Operation node defined - "+node.operation);
 			}
@@ -85,10 +85,10 @@ module.exports = function(RED) {
 				}
 				out[outArg]=tmpValue;
 			}
-                        //AWS API takes 'Payload' not 'payload' (see Lambda)
-                        if (arg=="Payload" && typeof tmpValue == 'undefined'){
-                                out[arg]=src["payload"];
-                        }
+			//AWS API takes 'Payload' not 'payload' (see Lambda)
+			if (arg=="Payload" && typeof tmpValue == 'undefined'){
+					out[arg]=src["payload"];
+			}
 
 		}
 
@@ -274,13 +274,10 @@ module.exports = function(RED) {
 			
 			copyArg(n,"KeyId",params,undefined,false); 
 			copyArg(n,"Plaintext",params,undefined,true); 
-			
 			copyArg(msg,"KeyId",params,undefined,false); 
-			copyArg(msg,"Plaintext",params,undefined,true); 
+			copyArg(msg,"Plaintext",params,undefined,false); 
 			copyArg(msg,"EncryptionContext",params,undefined,true); 
 			copyArg(msg,"GrantTokens",params,undefined,true); 
-			
-
 			svc.encrypt(params,cb);
 		}
 

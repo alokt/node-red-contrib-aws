@@ -69,7 +69,7 @@ module.exports = function(RED) {
 
 			if (typeof service[node.operation] == "function"){
 				node.status({fill:"blue",shape:"dot",text:node.operation});
-				service[node.operation](awsService,msg,_cb);
+				service[node.operation](awsService,msg.payload,_cb);
 			} else {
 				node.error("failed: Operation node defined - "+node.operation);
 			}
@@ -613,7 +613,6 @@ module.exports = function(RED) {
 			copyArg(msg,"ExpressionAttributeNames",params,undefined,true); 
 			copyArg(msg,"ExpressionAttributeValues",params,undefined,true); 
 			
-
 			svc.updateItem(params,cb);
 		}
 
